@@ -26,15 +26,20 @@ namespace EF_with_Razor.Pages.Students
         public string CurrentFilter { get; set; }
         public string CurrentSort { get; set; }
 
-        public async Task OnGetAsync(string sortOrder)
+        public async Task OnGetAsync(string sortOrder, string searchString)
         {
-            // using System;
             NameSort = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             DateSort = sortOrder == "Date" ? "date_desc" : "Date";
 
-            IQueryable<Student> studentsIQ = from s in _context.Students
-                                             select s;
+            CurrentFilter = searchString;
 
+            IQueryable<Student> studentsIQ = from s in _context.Students select s;
+           
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                studentsIQ = studentsIQ.Where(s => s.LastName.Contains(searchString)
+                                       || s.FirstMidName.Contains(searchString));
+            }
             switch (sortOrder)
             {
                 case "name_desc":
